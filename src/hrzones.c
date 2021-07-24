@@ -10,7 +10,7 @@ cc hrzones.c -o hrzones -lm -O2 -Wall -ansi -pedantic -static
 #include <string.h> /* strlen() */
 #include <ctype.h>  /* isdigit() */
 
-#define VERSION "0.10b"
+#define VERSION "0.10a"
 
 double round(double x);
 
