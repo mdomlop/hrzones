@@ -5,7 +5,7 @@ _pkgver_month=07
 _pkgver_day=24
 
 pkgname=hrzones
-pkgver=0.10b
+pkgver=0.10a
 pkgrel=1
 pkgdesc='Calculate heart rate training zones, based on Karvonen formula.'
 arch=('i686' 'x86_64')

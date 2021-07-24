@@ -1,7 +1,7 @@
 NAME = HRZones
 EXECUTABLE = hrzones
 DESCRIPTION = Calculate heart rate training zones, based on Karvonen formula.
-VERSION = 0.10b
+VERSION = 0.10a
 AUTHOR = Manuel Domínguez López
 MAIL := $(shell echo zqbzybc@tznvy.pbz | tr '[A-Za-z]' '[N-ZA-Mn-za-m]')
 URL = https://github.com/mdomlop/$(EXECUTABLE)
