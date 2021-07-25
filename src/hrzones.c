@@ -14,6 +14,8 @@ cc hrzones.c -o hrzones -lm -O2 -Wall -ansi -pedantic -static
 #define VERSION "0.10a"
 
 double round(double x);
+int getopt(int argc, char *const argv[], const char *optstring);
+extern int optind, optopt;
 
 int is_integer (char * s)
 /* Determines if passed string is a positive integer */
@@ -22,7 +24,7 @@ int is_integer (char * s)
     short sc = strlen(s);
     for ( c = 0; c < sc; c ++ )
     {
-        if ( isdigit( s[c] ) )
+        if (isdigit (s[c]))
             continue;
         else
 			return 0;
@@ -30,13 +32,30 @@ int is_integer (char * s)
     return 1;
 }
 
+void version (void)
+{
+	printf ("Version: %s\n", VERSION);
+}
 
 void help (int error)
 {
+	char text[] = "\nUsage:\n"
+	"\thrzones [-a] n1 [n2]\n\n"
+	"Options:\n\n"
+	"\tn1    An integer positive which is maximun heart rate (or age, if `-a'\n"
+	"\t      flag is present).\n"
+	"\tn2    An integer positive number which is resting heart rate.\n"
+	"\t      If provided, Karvonen's formula will be used.\n\n"
+	"\t-a    Indicate that `n1' is an age and not the maximum heart rate.\n"
+	"\t      Therebefore `n1' will be used to calculate the maximum heart \n"
+	"\t      rate with the Tanaka's formula.\n"
+	"\t-h    Show this help.\n"
+	"\t-v    Show program version and exit.\n";
+
 	if (error)
-		fprintf (stderr, "Error. Mostrar ayuda.\n");
+		fprintf (stderr, "%s\n", text);
 	else
-		printf ("Sin error. Mostrar ayuda.\n");
+		printf ("%s\n", text);
 }
 
 int tanaka (int n)
@@ -55,20 +74,23 @@ int main(int argc, char ** argv)
 
 
 	int aflag = 0;
-	int index;
 	int c;
-
-	opterr = 0;
 
 	int non_optc;
 
 
-	while ((c = getopt (argc, argv, "a")) != -1)
+	while ((c = getopt (argc, argv, "ahv")) != -1)
 		switch (c)
 		{
 			case 'a':
 				aflag = 1;
 				break;
+			case 'h':
+				help(1);
+				return 0;
+			case 'v':
+				version();
+				return 0;
 			case '?':
 				if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -87,6 +109,7 @@ int main(int argc, char ** argv)
 		case 0:
 			if (aflag) fprintf (stderr, "Sorry, `-a' flag needs a number.\n");
 			else fprintf (stderr, "I need at least one argument.\n");
+			help(1);
 			return 1;
 
 		case 1:  /* Age or HRMax */
@@ -136,7 +159,7 @@ int main(int argc, char ** argv)
 			}
 
 		default:
-			fprintf(stderr, "There are too much arguments: %d\n", argc);
+			fprintf(stderr, "There are too much arguments: %d\n", non_optc);
 			return 1;
 			break;
 	}
