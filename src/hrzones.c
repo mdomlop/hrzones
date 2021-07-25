@@ -5,10 +5,11 @@ cc hrzones.c -o hrzones -lm -O2 -Wall -ansi -pedantic -static
 */
 
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
+#include <math.h>   /* round() */
+#include <stdlib.h> /* abort() */
 #include <string.h> /* strlen() */
 #include <ctype.h>  /* isdigit() */
+#include <unistd.h>
 
 #define VERSION "0.10a"
 
@@ -30,58 +31,110 @@ int is_integer (char * s)
 }
 
 
+void help (int error)
+{
+	if (error)
+		fprintf (stderr, "Error. Mostrar ayuda.\n");
+	else
+		printf ("Sin error. Mostrar ayuda.\n");
+}
+
+int tanaka (int n)
+{
+	int x = round(208.75 - (n * 0.73));  /* Tanaka hrmax */
+	return x;
+}
+
+
 int main(int argc, char ** argv)
 {
+
 	int age, hrmax, hrmin = 0;
 	int zones[5] = {50, 60, 70, 80, 90};
 	int i, bpm, prev, bpm_standard, bpm_karvonen;
 
-	switch (argc)
+
+	int aflag = 0;
+	int index;
+	int c;
+
+	opterr = 0;
+
+	int non_optc;
+
+
+	while ((c = getopt (argc, argv, "a")) != -1)
+		switch (c)
+		{
+			case 'a':
+				aflag = 1;
+				break;
+			case '?':
+				if (isprint (optopt))
+					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+				else
+					fprintf (stderr, "Unknown option character `\\x%x'.\n",
+							optopt);
+                return 1;
+			default:
+				abort ();
+		}
+
+	non_optc = argc - optind;
+
+	switch (non_optc)
 	{
 		case 0:
-			fprintf(stderr, "There are no arguments. Is everything OK?\n");
+			if (aflag) fprintf (stderr, "Sorry, `-a' flag needs a number.\n");
+			else fprintf (stderr, "I need at least one argument.\n");
 			return 1;
-			break;
-		case 1:
-			fprintf(stderr, "Please, specify the age value.\n"
-							"\nFor example: %s 40\n", argv[0]);
-			return 1;
-			break;
-		case 2:
-			if (!is_integer(argv[1]))
+
+		case 1:  /* Age or HRMax */
+
+			if (is_integer(argv[optind]))
 			{
-				fprintf(stderr, "Age value must be a positive integer.\n");
+				age = atoi(argv[optind]);
+				if (aflag)
+				{
+					hrmax = tanaka(age);
+					printf("Age: %d HRMax: %d (Tanaka)\n", age, hrmax);
+				}
+				else
+				{
+					hrmax = age;
+					printf("HRMax: %d\n", hrmax);
+				}
+				break;
+			}
+			else {
+				fprintf (stderr, "Arguments must be positive integers.\n");
 				return 1;
 			}
-			age = atoi(argv[1]);
-			hrmax = round(208.75 - (age * 0.73));  /* Tanaka hrmax */
-			/*printf("Age: %d HRMax: %d (Tanaka) HRMin: Unknown\n", age, hrmax); */
-			printf("Age: %d HRMax: %d (Tanaka)\n", age, hrmax);
-			break;
-		case 3:
-			if (!is_integer(argv[2]))
+
+		case 2:  /* Age or HRMax and HRMin*/
+			if (is_integer(argv[optind]) && is_integer(argv[optind + 1]))
 			{
-				fprintf(stderr, "HRMax value must be a positive integer.\n");
+				age = atoi(argv[optind]);
+				hrmin = atoi(argv[optind + 1]);
+
+				if (aflag)
+				{
+					hrmax = tanaka(age);
+					printf("Age: %d HRMax: %d (Tanaka) HRMin: %d\n", age, hrmax, hrmin);
+				}
+				else
+				{
+					hrmax = age;
+					printf("HRMax: %d HRMin: %d\n", hrmax, hrmin);
+				}
+				break;
+			}
+			else
+			{
+				fprintf (stderr, "Arguments must be positive integers.\n");
 				return 1;
 			}
-			hrmax = atoi(argv[2]);
-			printf("HRMax: %d\n", hrmax);
-			break;
-		case 4:  /* Karvonen formula */
-			if (!is_integer(argv[2]))
-			{
-				fprintf(stderr, "HRMax value must be a positive integer.\n");
-				return 1;
-			}
-			if (!is_integer(argv[3]))
-			{
-				fprintf(stderr, "HRMin value must be a positive integer.\n");
-				return 1;
-			}
-			hrmax = atoi(argv[2]);
-			hrmin = atoi(argv[3]);
-			printf("HRMax: %d HRMin: %d\n", hrmax, hrmin);
-			break;
+
 		default:
 			fprintf(stderr, "There are too much arguments: %d\n", argc);
 			return 1;
@@ -109,5 +162,5 @@ int main(int argc, char ** argv)
 		prev = bpm - 1;
 	}
 
-    return 0;
+  return 0;
 }
