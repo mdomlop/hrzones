@@ -1,11 +1,11 @@
-NAME = HRZones
-EXECUTABLE = hrzones
-DESCRIPTION = Calculate heart rate training zones, based on Karvonen formula.
-VERSION = 0.10a
-AUTHOR = Manuel Domínguez López
-MAIL := $(shell echo zqbzybc@tznvy.pbz | tr '[A-Za-z]' '[N-ZA-Mn-za-m]')
-URL = https://github.com/mdomlop/$(EXECUTABLE)
-LICENSE = GPL3
+NAME = $(shell grep -m1 PROGRAM src/hrzones.c | cut -d\" -f2)
+EXECUTABLE = $(shell grep -m1 EXECUTABLE src/hrzones.c | cut -d\" -f2)
+DESCRIPTION = $(shell grep -m1 DESCRIPTION src/hrzones.c | cut -d\" -f2)
+VERSION = $(shell grep -m1 VERSION src/hrzones.c | cut -d\" -f2)
+AUTHOR = $(shell grep -m1 AUTHOR src/hrzones.c | cut -d\" -f2)
+MAIL := $(shell grep -m1 MAIL src/hrzones.c | cut -d\" -f2 | tr '[A-Za-z]' '[N-ZA-Mn-za-m]')
+URL = $(shell grep -m1 URL src/hrzones.c | cut -d\" -f2)
+LICENSE = $(shell grep -m1 LICENSE src/hrzones.c | cut -d\" -f2)
 
 
 PREFIX = '/usr'
@@ -13,11 +13,14 @@ DESTDIR = ''
 
 ARCHPKG = $(EXECUTABLE)-$(VERSION)-1-$(shell uname -m).pkg.tar.xz
 
-CFLAGS = -march=native -mtune=native -O2 -Wall -ansi -pedantic -static
+CFLAGS = -O2 -Wall -ansi -pedantic -static
 LDLIBS = -lm
 
-
 src/$(EXECUTABLE): src/$(EXECUTABLE).c
+
+opti: CFLAGS = -march=native -mtune=native -O2 -Wall -ansi -pedantic -static
+opti: src/$(EXECUTABLE)
+install_opti: opti install
 
 install: src/$(EXECUTABLE) LICENSE README.md
 	install -Dm 755 src/$(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/$(EXECUTABLE)
@@ -30,13 +33,13 @@ uninstall:
 
 arch_clean:
 	rm -rf pkg
-	rm -f $(EXECUTABLE)*.pkg.tar.xz
+	rm -f $(ARCHPKG)
 
 clean: arch_clean
 	rm -rf src/$(EXECUTABLE)
 
 arch_pkg: $(ARCHPKG)
-$(ARCHPKG): PKGBUILD makefile src/$(EXECUTABLE) LICENSE README.md
+$(ARCHPKG): PKGBUILD makefile src/$(EXECUTABLE).c LICENSE README.md
 	sed -i "s|pkgname=.*|pkgname=$(EXECUTABLE)|" PKGBUILD
 	sed -i "s|pkgver=.*|pkgver=$(VERSION)|" PKGBUILD
 	sed -i "s|pkgdesc=.*|pkgdesc='$(DESCRIPTION)'|" PKGBUILD
@@ -48,4 +51,5 @@ $(ARCHPKG): PKGBUILD makefile src/$(EXECUTABLE) LICENSE README.md
 	@echo You can install it as root with:
 	@echo pacman -U $@
 
-.PHONY: clean arch_clean install uninstall arch_pkg
+.PHONY: clean arch_clean uninstall
+

@@ -9,9 +9,9 @@ pkgver=0.10a
 pkgrel=1
 pkgdesc='Calculate heart rate training zones, based on Karvonen formula.'
 arch=('i686' 'x86_64')
-url="https://github.com/mdomlop/$pkgname"
+url='https://github.com/mdomlop/netmon'
 source=()
-license=('GPL3')
+license=('GPLv3+')
 
 build() {
     cd $startdir

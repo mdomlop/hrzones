@@ -11,7 +11,14 @@ cc hrzones.c -o hrzones -lm -O2 -Wall -ansi -pedantic -static
 #include <ctype.h>  /* isdigit() */
 #include <unistd.h>
 
-#define VERSION "0.10a"
+#define PROGRAM     "HRZones"
+#define EXECUTABLE  "hrzones"
+#define DESCRIPTION "Calculate heart rate training zones, based on Karvonen formula."
+#define VERSION     "0.10a"
+#define AUTHOR      "Manuel Domínguez López"
+#define MAIL        "zqbzybc@tznvy.pbz"
+#define URL         "https://github.com/mdomlop/netmon"
+#define LICENSE     "GPLv3+"
 
 double round(double x);
 int getopt(int argc, char *const argv[], const char *optstring);
@@ -44,11 +51,12 @@ void help (int error)
 	"Options:\n\n"
 	"\tn1    An integer positive which is maximun heart rate (or age, if `-a'\n"
 	"\t      flag is present).\n"
-	"\tn2    An integer positive number which is resting heart rate.\n"
-	"\t      If provided, Karvonen's formula will be used.\n\n"
-	"\t-a    Indicate that `n1' is an age and not the maximum heart rate.\n"
-	"\t      Therebefore `n1' will be used to calculate the maximum heart \n"
-	"\t      rate with the Tanaka's formula.\n"
+	"\tn2    An integer positive number which is resting HR.\n"
+	"\t      If provided, Karvonen's formula will be used. Otherwise, the\n"
+	"\t      classic method.\n\n"
+	"\t-a    Indicate that `n1' is an age and not the maximum HR.\n"
+	"\t      Therebefore `n1' will be used to calculate the maximum HR \n"
+	"\t      with the Tanaka's formula.\n"
 	"\t-h    Show this help.\n"
 	"\t-v    Show program version and exit.\n";
 
