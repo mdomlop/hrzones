@@ -14,13 +14,26 @@ DESTDIR = ''
 ARCHPKG = $(EXECUTABLE)-$(VERSION)-1-$(shell uname -m).pkg.tar.xz
 
 CFLAGS = -O2 -Wall -ansi -pedantic -static
+#CFLAGS = -O2 -Wall -ansi -pedantic -static --std=c18
 LDLIBS = -lm
 
 src/$(EXECUTABLE): src/$(EXECUTABLE).c
+src/$(EXECUTABLE).exe: src/$(EXECUTABLE).c
+	$(CC) $^ -o $@
+
+all: elf exe
+
+elf: src/$(EXECUTABLE)
+
+exe: CC = x86_64-w64-mingw32-gcc
+exe: src/$(EXECUTABLE).exe
 
 opti: CFLAGS = -march=native -mtune=native -O2 -Wall -ansi -pedantic -static
 opti: src/$(EXECUTABLE)
 install_opti: opti install
+
+debug: CFLAGS = -Wall -ggdb3
+debug: src/$(EXECUTABLE)
 
 install: src/$(EXECUTABLE) LICENSE README.md
 	install -Dm 755 src/$(EXECUTABLE) $(DESTDIR)$(PREFIX)/bin/$(EXECUTABLE)
@@ -37,6 +50,7 @@ arch_clean:
 
 clean: arch_clean
 	rm -rf src/$(EXECUTABLE)
+	rm -rf src/$(EXECUTABLE).exe
 
 arch_pkg: $(ARCHPKG)
 $(ARCHPKG): PKGBUILD makefile src/$(EXECUTABLE).c LICENSE README.md
@@ -52,4 +66,3 @@ $(ARCHPKG): PKGBUILD makefile src/$(EXECUTABLE).c LICENSE README.md
 	@echo pacman -U $@
 
 .PHONY: clean arch_clean uninstall
-
